@@ -6,6 +6,8 @@
 #include <boost/asio/ssl/context.hpp>
 #include <boost/asio/ssl/stream.hpp>
 #include <boost/system/error_code.hpp>
+#include <string>
+#include <vector>
 
 class SslFixedReplySession;
 
@@ -21,10 +23,24 @@ class SslFixedReplySession;
  *
  * Use OpenSSL to connect to the server:
  * > openssl s_client -connect localhost:{port_nr}
+ * > openssl s_client -connect localhost:{port_nr} -CAfile {root CA cert}
+ * > openssl s_client -connect localhost:{port_nr} \
+ * > -CAfile {root CA cert} -key {private key} -cert {signed cert}
  */
 class SslFixedReplyServer {
 public:
-	SslFixedReplyServer(boost::asio::io_service& io_, int port); 
+	/**
+	 * Construct an SslFixedReplyServer.
+	 * @param port 		where this server listens for incomming requests;
+	 * @param cert 		path of the certificate file that the server
+	 *		authenticates itself with;
+	 * @param privateKey	path of the private key used to unlock cert; and
+	 * @param trustedCaCertifcates		vector of paths to trusted CA's.
+	 */
+	SslFixedReplyServer(
+			boost::asio::io_service& io_, int port,
+			const std::string& cert, const std::string& privateKey,
+			const std::vector<std::string>& trustedCaCertifcates);
 
 	/**
 	 * Callback to supply password to asio
@@ -41,6 +57,11 @@ public:
 	 * replies with fixed response.
 	 */
 	void handle_accept(SslFixedReplySession* session, const boost::system::error_code& ec); 
+
+	/**
+	 * Callback to verify certifacates
+	 */
+	bool handle_verify(bool preverified, boost::asio::ssl::verify_context& context);
 
 private:
 	boost::asio::io_service& io;
