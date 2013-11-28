@@ -78,4 +78,6 @@ createCert(server root-ca "")
 createPKI_keypair(client)
 createCert(client root-ca "")
 
+createPKI_keypair(secondRoot-ca)
+selfSign(secondRoot-ca)
 # vim:set tabstop=4 shiftwidth=4 :
