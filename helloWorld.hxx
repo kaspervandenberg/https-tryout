@@ -25,7 +25,7 @@ class SslFixedReplySession;
  * > openssl s_client -connect localhost:{port_nr}
  * > openssl s_client -connect localhost:{port_nr} -CAfile {root CA cert}
  * > openssl s_client -connect localhost:{port_nr} \
- * > -CAfile {root CA cert} -key {private key} -cert {signed cert}
+ *   -CAfile {root CA cert} -key {private key} -cert {signed cert}
  */
 class SslFixedReplyServer {
 public:
@@ -41,6 +41,16 @@ public:
 			boost::asio::io_service& io_, int port,
 			const std::string& cert, const std::string& privateKey,
 			const std::vector<std::string>& trustedCaCertifcates);
+
+	/**
+	 * Add the certificate to the trusted CA certificates.
+	 * @param fileName	path to PEM file containing certificate
+	 * @addTrustedCaCertificate		true: send all CA names in the file to the
+	 *			client during handshake;
+	 *		false: only add the CA's to the trusted CA but do not send these
+	 *			CA's to the client.
+	 */
+	void addTrustedCaCertificate(std::string fileName, bool addToClientCaList);
 
 	/**
 	 * Callback to supply password to asio

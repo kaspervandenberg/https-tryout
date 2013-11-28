@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <stdexcept>
 
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
@@ -10,6 +11,9 @@
 #include <boost/bind.hpp>
 #include <boost/bind/arg.hpp>
 #include <boost/program_options.hpp>
+
+#include <openssl/ssl.h>
+#include <openssl/safestack.h>
 
 using namespace boost::asio;
 using namespace boost::asio::ssl;
@@ -69,7 +73,7 @@ SslFixedReplyServer::SslFixedReplyServer(io_service& io_, int port,
 			sslContext(context::sslv3) {
 
 	for(std::string caCertFile: trustedCaCertificateFiles) {
-		sslContext.load_verify_file(caCertFile);
+		addTrustedCaCertificate(caCertFile, true);
 	}
 
 	sslContext.set_verify_mode(verify_fail_if_no_peer_cert | verify_peer);
@@ -81,6 +85,16 @@ SslFixedReplyServer::SslFixedReplyServer(io_service& io_, int port,
 	start_accept();
 }
 
+void SslFixedReplyServer::addTrustedCaCertificate(std::string fileName, bool addToClientCaList) {
+	sslContext.load_verify_file(fileName);
+	if (addToClientCaList) {
+		STACK_OF(X509_NAME) *old_cert_names = SSL_CTX_get_client_CA_list(sslContext.native_handle());
+		if(old_cert_names != nullptr && sk_X509_NAME_num(old_cert_names) > 0) {
+			throw new std::logic_error("TODO: implement merging stacks of client CAs");
+		}
+		SSL_CTX_set_client_CA_list(sslContext.native_handle(), SSL_load_client_CA_file(fileName.c_str()));
+	}
+}
 
 std::string SslFixedReplyServer::get_password() const {
 	return "";
