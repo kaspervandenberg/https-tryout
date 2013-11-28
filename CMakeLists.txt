@@ -19,8 +19,6 @@ set (LIBS ${LIBS} ${OPENSSL_LIBRARIES})
 
 target_link_libraries (HelloWorld ${LIBS})
 
-file (INSTALL ${CMAKE_SOURCE_DIR}/resources/ DESTINATION ${CMAKE_BINARY_DIR})
-
 # Generate demo certificates
 file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/certs)
 find_program (OPENSSL_BIN NAMES openssl)
