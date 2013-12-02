@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 2.8)
 project (Https-Tryout)
 add_executable (HelloWorld helloWorld.cxx)
+add_executable (HttpServer httpServer.cxx)
+#add_executable (HttpsServer httpsServer.cxx)
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
 
@@ -17,7 +19,15 @@ find_package (OpenSSL 1.0.1 REQUIRED)
 include_directories (${OPENSSL_INCLUDE_DIR})
 set (LIBS ${LIBS} ${OPENSSL_LIBRARIES})
 
+
+#Use C++-netlib
+include_directories (${CMAKE_SOURCE_DIR}/../cpp-netlib.git)
+
 target_link_libraries (HelloWorld ${LIBS})
+target_link_libraries (HttpServer ${LIBS})
+#target_link_libraries (HttpsServer ${LIBS})
+
+
 
 # Generate demo certificates
 file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/certs)
