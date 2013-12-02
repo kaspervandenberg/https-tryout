@@ -10,7 +10,7 @@ set(CMAKE_CXX_FLAGS "-std=c++11")
 set (Boost_USE_STATIC_LIBS OFF)
 set (Boost_USE_MULTITHREADED ON)
 set (Boost_USE_STATIC_RUNTIME OFF)
-find_package (Boost 1.53.0 REQUIRED system thread regex program_options)
+find_package (Boost 1.54.0 REQUIRED system thread regex program_options)
 include_directories (${Boost_INCLUDE_DIRS})
 set (LIBS ${LIBS} ${Boost_LIBRARIES})
 
@@ -21,7 +21,15 @@ set (LIBS ${LIBS} ${OPENSSL_LIBRARIES})
 
 
 #Use C++-netlib
-include_directories (${CMAKE_SOURCE_DIR}/../cpp-netlib.git)
+set (CPP-NETLIB_ROOT /home/kasper/tmp/cpp-netlib-0.11-rc0/cpp-netlib-0.11.0-rc0)
+set (CPP-NETLIB_INCLUDEDIR ${CPP-NETLIB_ROOT})
+set (CPP-NETLIB_LIBRARIES 
+		${CPP-NETLIB_ROOT}/libs/network/src/libcppnetlib-uri.a 
+		${CPP-NETLIB_ROOT}/libs/network/src/libcppnetlib-client-connections.a 
+		${CPP-NETLIB_ROOT}/libs/network/src/libcppnetlib-server-parsers.a)
+
+include_directories (${CPP-NETLIB_ROOT})
+set (LIBS ${LIBS} ${CPP-NETLIB_LIBRARIES})
 
 target_link_libraries (HelloWorld ${LIBS})
 target_link_libraries (HttpServer ${LIBS})
