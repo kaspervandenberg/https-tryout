@@ -1,9 +1,6 @@
-#include <boost/network/protocol/http.hpp>
 #include <boost/network/protocol/http/server.hpp>
-
-
-// using namespace boost::network;
 namespace http = boost::network::http;
+
 
 struct HttpHandler;
 

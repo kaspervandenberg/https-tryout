@@ -14,6 +14,7 @@ find_package (Boost 1.54.0 REQUIRED system thread regex program_options)
 include_directories (${Boost_INCLUDE_DIRS})
 set (LIBS ${LIBS} ${Boost_LIBRARIES})
 
+
 #Use OpenSSL
 find_package (OpenSSL 1.0.1 REQUIRED)
 include_directories (${OPENSSL_INCLUDE_DIR})
@@ -21,20 +22,15 @@ set (LIBS ${LIBS} ${OPENSSL_LIBRARIES})
 
 
 #Use C++-netlib
-set (CPP-NETLIB_ROOT /home/kasper/tmp/cpp-netlib-0.11-rc0/cpp-netlib-0.11.0-rc0)
-set (CPP-NETLIB_INCLUDEDIR ${CPP-NETLIB_ROOT})
-set (CPP-NETLIB_LIBRARIES 
-		${CPP-NETLIB_ROOT}/libs/network/src/libcppnetlib-uri.a 
-		${CPP-NETLIB_ROOT}/libs/network/src/libcppnetlib-client-connections.a 
-		${CPP-NETLIB_ROOT}/libs/network/src/libcppnetlib-server-parsers.a)
+find_package (cppnetlib 0.11.0 REQUIRED)
+include_directories (${CPPNETLIB_INCLUDE_DIRS})
+set (LIBS ${LIBS} ${CPPNETLIB_LIBRARIES})
 
-include_directories (${CPP-NETLIB_ROOT})
-set (LIBS ${LIBS} ${CPP-NETLIB_LIBRARIES})
+
 
 target_link_libraries (HelloWorld ${LIBS})
 target_link_libraries (HttpServer ${LIBS})
 #target_link_libraries (HttpsServer ${LIBS})
-
 
 
 # Generate demo certificates
