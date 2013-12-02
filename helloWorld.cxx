@@ -132,16 +132,17 @@ int main(int argc, char* argv[]) {
 	std::string certPrivateKeyFile;
 	std::vector<std::string> caFiles;
 
+	po::options_description desc("Allowed options");
+	desc.add_options()
+		("help,h", "display this message")
+		("port,p", po::value<int>(&port)->required(), "port to listen on")
+		("certFile", po::value<std::string>(&certFile)->required(), "certificate to send as authentication")
+		("certKey", po::value<std::string>(&certPrivateKeyFile)->required(), "private key for certificate")
+		("caFile", po::value<std::vector<std::string> >(&caFiles), "List certificate files of trusted CA's")
+	;
+
 	try {
 
-		po::options_description desc("Allowed options");
-		desc.add_options()
-			("help,h", "display this message")
-			("port,p", po::value<int>(&port)->required(), "port to listen on")
-			("certFile", po::value<std::string>(&certFile)->required(), "certificate to send as authentication")
-			("certKey", po::value<std::string>(&certPrivateKeyFile)->required(), "private key for certificate")
-			("caFile", po::value<std::vector<std::string> >(&caFiles), "List certificate files of trusted CA's")
-		;
 
 		po::variables_map vm;
 		po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -151,7 +152,12 @@ int main(int argc, char* argv[]) {
 		}
 		po::notify(vm);
 	} catch (std::exception& ex) {
-		std::cerr << ex.what() <<"\n";
+		std::cerr << "Missing required option: \n";
+		std::cerr << ex.what() << "\n";
+		
+		std::cerr << "Useage:\n";
+		desc.print(std::cerr);
+
 		exit(1);
 	}
 
