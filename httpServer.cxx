@@ -35,10 +35,37 @@ struct ASyncHttpHandler
 			const ASyncHttpServer::request& request,
 			ASyncHttpServer::connection_ptr connection)
 	{
+		std::ostringstream responseBody;
+		responseBody << "<body>";
+		responseBody << "Received ASync request.:\n";
+
+		responseBody << "Headers:\n";
+		auto headers_range = request.headers;
+		for (auto header: headers_range) {
+			responseBody << "\t" << header.name << ":" << header.value << "\n";
+		}
+		responseBody << "\n";
+		responseBody << "Destination: " << request.destination << "\n";
+		responseBody << "Body:\n" << request.body <<"\n\n";
+		responseBody << "</body>\n";
+
+		std::shared_ptr<std::string> replyMessage { new std::string(responseBody.str()) };
+
+		connection->set_status(ASyncHttpServer::connection::ok);
 		
-//								= ASyncHttpServer::response::stock_reply(
-//				ASyncHttpServer::response::ok, "Hello World (ASync-HTTP)\n");
-//			connection->write(response);
+		int i_replySize = replyMessage->size();
+		std::ostringstream fmt_replySize;
+		fmt_replySize << i_replySize;
+		std::string str_replySize = fmt_replySize.str();
+		std::vector<ASyncHttpServer::response_header> headers {
+			{ "Content-Type",  "text/text; charset=utf-8" },
+			{ "Content-Length", str_replySize }
+		};
+		connection->set_headers(boost::make_iterator_range(headers.begin(), headers.end()));
+
+		std::cout << *replyMessage;
+
+		connection->write(*replyMessage);
 	}
 };
 
@@ -52,7 +79,7 @@ int main(int argc, char * argv[])
 	desc.add_options()
 		("help,h", "display this message")
 		("port,p", po::value<std::string>(&port)->required(), "port to listen on")
-		("async", po::value<bool>(&asyncServer)->default_value(false), "use asynchronous server")
+		("async", po::bool_switch(&asyncServer), "use asynchronous server")
 	;
 
 	try {
