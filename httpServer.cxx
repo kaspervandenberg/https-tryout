@@ -2,6 +2,8 @@
 #include <boost/network/utils/thread_pool.hpp>
 
 #include <boost/program_options.hpp>
+#include <sstream>
+#include <iostream>
 
 namespace http = boost::network::http;
 namespace po = boost::program_options;
@@ -13,6 +15,48 @@ struct ASyncHttpHandler;
 typedef http::server<SyncHttpHandler> SyncHttpServer;
 typedef http::async_server<ASyncHttpHandler> ASyncHttpServer;
 
+enum class Synchronicity {
+	ASYNCHRONE,
+	SYNCHRONE
+};
+
+std::ostream& operator<< (std::ostream& stream, const Synchronicity& s)
+{
+	switch (s) {
+		case Synchronicity::ASYNCHRONE: 
+			return stream << "ASynchrone";
+			break;
+		case Synchronicity::SYNCHRONE:
+			return stream << "Synchrone";
+			break;
+		default:
+			throw new std::logic_error("Unknown type of Synchronicity.");
+	}
+}
+
+template <typename TRequest>
+std::string echoRequest (const Synchronicity& synchronicity, const TRequest& request)
+{
+	std::stringstream responseBody;
+
+	responseBody << "<body>";
+	responseBody << "Received " << synchronicity << " request.:\n";
+
+	responseBody << "Headers:\n";
+	auto headers_range = request.headers;
+	for (auto header: headers_range) {
+		responseBody << "\t" << header.name << ":" << header.value << "\n";
+	}
+	responseBody << "\n";
+	responseBody << "Destination: " << request.destination << "\n";
+	responseBody << "Body:\n" << request.body <<"\n\n";
+	responseBody << "</body>\n";
+	
+
+	return responseBody.str();
+}
+
+
 struct SyncHttpHandler
 {
 	void operator()	(
@@ -20,7 +64,8 @@ struct SyncHttpHandler
 			SyncHttpServer::response& response)
 	{
 		response = SyncHttpServer::response::stock_reply(
-				SyncHttpServer::response::ok, "Hello World (HTTP)\n");
+				SyncHttpServer::response::ok,
+				echoRequest(Synchronicity::SYNCHRONE, request));
 	}
 	
 	void log(const SyncHttpServer::string_type& info)
@@ -35,21 +80,9 @@ struct ASyncHttpHandler
 			const ASyncHttpServer::request& request,
 			ASyncHttpServer::connection_ptr connection)
 	{
-		std::ostringstream responseBody;
-		responseBody << "<body>";
-		responseBody << "Received ASync request.:\n";
-
-		responseBody << "Headers:\n";
-		auto headers_range = request.headers;
-		for (auto header: headers_range) {
-			responseBody << "\t" << header.name << ":" << header.value << "\n";
-		}
-		responseBody << "\n";
-		responseBody << "Destination: " << request.destination << "\n";
-		responseBody << "Body:\n" << request.body <<"\n\n";
-		responseBody << "</body>\n";
-
-		std::shared_ptr<std::string> replyMessage { new std::string(responseBody.str()) };
+		std::shared_ptr<std::string> replyMessage { 
+				new std::string { 
+						echoRequest(Synchronicity::ASYNCHRONE, request) }};
 
 		connection->set_status(ASyncHttpServer::connection::ok);
 		
