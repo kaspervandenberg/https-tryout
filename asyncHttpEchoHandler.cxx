@@ -2,7 +2,7 @@
 
 #include "echoRequest.hxx"
 
-void ASyncHttpHandler::operator() (
+void ASyncHttpEchoHandler::operator() (
 		const ASyncHttpServer::request& request,
 		ASyncHttpServer::connection_ptr connection)
 {

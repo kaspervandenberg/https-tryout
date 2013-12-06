@@ -1,7 +1,7 @@
 #include "syncHttpEchoHandler.hxx"
 #include "echoRequest.hxx"
 
-void SyncHttpHandler::operator()	(
+void SyncHttpEchoHandler::operator()	(
 		const SyncHttpServer::request& request,
 		SyncHttpServer::response& response)
 {
@@ -10,7 +10,7 @@ void SyncHttpHandler::operator()	(
 			echoRequest(Synchronicity::SYNCHRONE, request));
 }
 	
-void SyncHttpHandler::log(const SyncHttpServer::string_type& info)
+void SyncHttpEchoHandler::log(const SyncHttpServer::string_type& info)
 {
 	std::cerr << "ERROR " << info << '\n';
 }

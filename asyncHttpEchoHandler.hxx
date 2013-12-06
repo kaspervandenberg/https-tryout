@@ -4,9 +4,9 @@
 #include <boost/network/protocol/http/server.hpp>
 
 
-struct ASyncHttpHandler
+struct ASyncHttpEchoHandler
 {
-	typedef boost::network::http::async_server<ASyncHttpHandler> ASyncHttpServer;
+	typedef boost::network::http::async_server<ASyncHttpEchoHandler> ASyncHttpServer;
 
 	void operator()	(
 			const ASyncHttpServer::request& request,

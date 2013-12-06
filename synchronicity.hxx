@@ -9,6 +9,7 @@ enum class Synchronicity {
 };
 
 std::ostream& operator<< (std::ostream& stream, const Synchronicity& s);
+std::istream& operator>> (std::istream& stream, Synchronicity& s);
 
 
 #endif

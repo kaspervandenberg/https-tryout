@@ -5,33 +5,35 @@
 #include <sstream>
 #include <iostream>
 
-#include "syncHttpEchoHandler.hxx"
-#include "asyncHttpEchoHandler.hxx"
+
+#include "handlers.hxx"
+#include "synchronicity.hxx"
+#include "runServer.hxx"
 
 
 namespace http = boost::network::http;
 namespace po = boost::program_options;
 
 
-typedef http::server<SyncHttpHandler> SyncHttpServer;
-typedef http::async_server<ASyncHttpHandler> ASyncHttpServer;
+//typedef http::server<SyncHttpHandler> SyncHttpServer;
+//typedef http::async_server<ASyncHttpHandler> ASyncHttpServer;
 
 
 int main(int argc, char * argv[])
 {
 	std::string port;
-	bool asyncServer;
+	Synchronicity synchronicity;
+	Handlers handler;
 
 	po::options_description desc("Allowed options");
 	desc.add_options()
 		("help,h", "display this message")
 		("port,p", po::value<std::string>(&port)->required(), "port to listen on")
-		("async", po::bool_switch(&asyncServer), "use asynchronous server")
+		("async", po::value<Synchronicity>(&synchronicity)->default_value(Synchronicity::SYNCHRONE), "synchrous or asynchronous server")
+		("handler", po::value<Handlers>(&handler)->default_value(Handlers::ECHO), "How to handle requests?")
 	;
 
 	try {
-
-
 		po::variables_map vm;
 		po::store(po::parse_command_line(argc, argv, desc), vm);
 		if(vm.count("help")) {
@@ -49,31 +51,35 @@ int main(int argc, char * argv[])
 		exit(1);
 	}
 
-	if (asyncServer) {
-		ASyncHttpHandler handler;
+	runServer(synchronicity, handler, port); 
 
-		ASyncHttpServer::options options(handler);
+	#if 0
+	if (asyncServer) {
+		ASyncHttpEchoHandler handler;
+
+		http::async_server<ASyncHttpEchoHandler>::options options(handler);
 		options.address("0.0.0.0")
 				.port(port);
 		options.thread_pool(boost::make_shared<boost::network::utils::thread_pool>(2));
-		ASyncHttpServer server (options);
+		http::async_server<ASyncHttpEchoHandler> server (options);
 
-		boost::thread t1(boost::bind(&ASyncHttpServer::run, &server));
-		boost::thread t2(boost::bind(&ASyncHttpServer::run, &server));
+		boost::thread t1(boost::bind(&http::async_server<ASyncHttpEchoHandler>::run, &server));
+		boost::thread t2(boost::bind(&http::async_server<ASyncHttpEchoHandler>::run, &server));
 		server.run();
 		t1.join();
 		t2.join();
 
 	} else {
-		SyncHttpHandler handler;
+		SyncHttpEchoHandler handler;
 
-		SyncHttpServer::options options(handler);
+		http::server<SyncHttpEchoHandler>::options options(handler);
 		options.address("0.0.0.0")
 				.port(port);
-		SyncHttpServer server (options);
+		http::server<SyncHttpEchoHandler> server (options);
 
 		server.run();
 	}
+	#endif
 }
 
 /* vim:set tabstop=4 shiftwidth=4 fo=cqwan autoindent : */
