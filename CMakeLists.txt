@@ -1,7 +1,9 @@
 cmake_minimum_required (VERSION 2.8)
 project (Https-Tryout)
 add_executable (HelloWorld helloWorld.cxx)
-add_executable (HttpServer httpServer.cxx)
+add_executable (HttpServer httpServer.cxx
+		syncHttpEchoHandler.cxx synchronicity.cxx
+		asyncHttpEchoHandler.cxx)
 #add_executable (HttpsServer httpsServer.cxx)
 
 set(CMAKE_CXX_FLAGS "-std=c++11")

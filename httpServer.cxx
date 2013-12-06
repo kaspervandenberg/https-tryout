@@ -5,102 +5,16 @@
 #include <sstream>
 #include <iostream>
 
+#include "syncHttpEchoHandler.hxx"
+#include "asyncHttpEchoHandler.hxx"
+
+
 namespace http = boost::network::http;
 namespace po = boost::program_options;
 
 
-struct SyncHttpHandler;
-struct ASyncHttpHandler;
-
 typedef http::server<SyncHttpHandler> SyncHttpServer;
 typedef http::async_server<ASyncHttpHandler> ASyncHttpServer;
-
-enum class Synchronicity {
-	ASYNCHRONE,
-	SYNCHRONE
-};
-
-std::ostream& operator<< (std::ostream& stream, const Synchronicity& s)
-{
-	switch (s) {
-		case Synchronicity::ASYNCHRONE: 
-			return stream << "ASynchrone";
-			break;
-		case Synchronicity::SYNCHRONE:
-			return stream << "Synchrone";
-			break;
-		default:
-			throw new std::logic_error("Unknown type of Synchronicity.");
-	}
-}
-
-template <typename TRequest>
-std::string echoRequest (const Synchronicity& synchronicity, const TRequest& request)
-{
-	std::stringstream responseBody;
-
-	responseBody << "<body>";
-	responseBody << "Received " << synchronicity << " request.:\n";
-
-	responseBody << "Headers:\n";
-	auto headers_range = request.headers;
-	for (auto header: headers_range) {
-		responseBody << "\t" << header.name << ":" << header.value << "\n";
-	}
-	responseBody << "\n";
-	responseBody << "Destination: " << request.destination << "\n";
-	responseBody << "Body:\n" << request.body <<"\n\n";
-	responseBody << "</body>\n";
-	
-
-	return responseBody.str();
-}
-
-
-struct SyncHttpHandler
-{
-	void operator()	(
-			const SyncHttpServer::request& request,
-			SyncHttpServer::response& response)
-	{
-		response = SyncHttpServer::response::stock_reply(
-				SyncHttpServer::response::ok,
-				echoRequest(Synchronicity::SYNCHRONE, request));
-	}
-	
-	void log(const SyncHttpServer::string_type& info)
-	{
-		std::cerr << "ERROR " << info << '\n';
-	}
-};
-
-struct ASyncHttpHandler
-{
-	void operator()	(
-			const ASyncHttpServer::request& request,
-			ASyncHttpServer::connection_ptr connection)
-	{
-		std::shared_ptr<std::string> replyMessage { 
-				new std::string { 
-						echoRequest(Synchronicity::ASYNCHRONE, request) }};
-
-		connection->set_status(ASyncHttpServer::connection::ok);
-		
-		int i_replySize = replyMessage->size();
-		std::ostringstream fmt_replySize;
-		fmt_replySize << i_replySize;
-		std::string str_replySize = fmt_replySize.str();
-		std::vector<ASyncHttpServer::response_header> headers {
-			{ "Content-Type",  "text/text; charset=utf-8" },
-			{ "Content-Length", str_replySize }
-		};
-		connection->set_headers(boost::make_iterator_range(headers.begin(), headers.end()));
-
-		std::cout << *replyMessage;
-
-		connection->write(*replyMessage);
-	}
-};
 
 
 int main(int argc, char * argv[])
