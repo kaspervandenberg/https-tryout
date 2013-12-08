@@ -10,8 +10,20 @@
 #include <boost/archive/iterators/istream_iterator.hpp>
 #include <boost/archive/iterators/ostream_iterator.hpp>
 
+#include "base64.hxx"
+
 namespace {
 	namespace iter = boost::archive::iterators;
+
+	void dumpString(std::string caption, std::string value)
+	{
+		std::cout << caption << ":\n";
+		std::cout << "\t";
+		for (auto ch: value) {
+			std::cout << ch << "(" << int(ch) << ") ";
+		}
+		std::cout << "\n";
+	}
 
 	SyncHttp401Handler::SyncHttpServer::request::header_type findHeaderByName (
 			std::string targetName,
@@ -43,17 +55,24 @@ namespace {
 
 			std::cout << "base64 length: " << base64data.size() << "\n\n";
 
-			//iter::binary_from_base64<const unsigned char*>
-			typedef iter::transform_width <
-				iter::binary_from_base64 <
-					std::string::iterator>,
-				8, 6> decodingIter;
+			dumpString ("original", base64data);
 
-			auto iDecodedStart = decodingIter { base64data.begin() };
-			auto iDecodedEnd = decodingIter { base64data.end() };
+			base64decodingIterator iDecodedStart { base64data.begin() };
+			base64decodingIterator iDecodedEnd { base64data.end() };
 			std::string decodedData { iDecodedStart, iDecodedEnd };
 
-			std::cout << "Decoded: " << decodedData << "\n";
+			dumpString ("decoded(1)", decodedData);
+
+			base64encodingIterator iEncodedStart { decodedData.begin() };
+			base64encodingIterator iEncodedEnd { decodedData.end() };
+
+			std::string reencodedData = { iEncodedStart, iEncodedEnd };
+			dumpString ("re-encoded", reencodedData);
+
+			
+			dumpString("Decoded twice",
+					std::string (base64decodingIterator (reencodedData.begin()),
+							base64decodingIterator (reencodedData.end())));
 		}
 		catch (const std::range_error& ex)
 		{
@@ -61,7 +80,6 @@ namespace {
 			// No Authorization-header found so do not print anything.
 		}
 	}
-
 
 }
 
