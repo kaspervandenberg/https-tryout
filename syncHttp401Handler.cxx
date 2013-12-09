@@ -49,6 +49,7 @@ namespace {
 			std::string authorizationType;
 			std::string base64data;
 			headerValue >> authorizationType >> base64data;
+			std::string stripped64data = base64data.substr(0, base64data.find("="));
 
 			std::cout << "\t AuthorizationType: " << authorizationType << "\n"
 					<< "\t data (base64): " << base64data << "\n";
@@ -56,9 +57,10 @@ namespace {
 			std::cout << "base64 length: " << base64data.size() << "\n\n";
 
 			dumpString ("original", base64data);
+			dumpString ("stripped", stripped64data);
 
-			base64decodingIterator iDecodedStart { base64data.begin() };
-			base64decodingIterator iDecodedEnd { base64data.end() };
+			base64decodingIterator iDecodedStart { stripped64data.begin() };
+			base64decodingIterator iDecodedEnd { stripped64data.end() };
 			std::string decodedData { iDecodedStart, iDecodedEnd };
 
 			dumpString ("decoded(1)", decodedData);
