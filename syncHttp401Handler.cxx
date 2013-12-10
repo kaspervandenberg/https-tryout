@@ -59,8 +59,8 @@ namespace {
 			dumpString ("original", base64data);
 			dumpString ("stripped", stripped64data);
 
-			base64decodingIterator iDecodedStart { stripped64data.begin() };
-			base64decodingIterator iDecodedEnd { stripped64data.end() };
+			base64decodingIterator iDecodedStart { base64data.begin() };
+			base64decodingIterator iDecodedEnd { base64data.begin() + base64data.find("=") };
 			std::string decodedData { iDecodedStart, iDecodedEnd };
 
 			dumpString ("decoded(1)", decodedData);
@@ -69,12 +69,13 @@ namespace {
 			base64encodingIterator iEncodedEnd { decodedData.end() };
 
 			std::string reencodedData = { iEncodedStart, iEncodedEnd };
+			reencodedData += "=";
 			dumpString ("re-encoded", reencodedData);
 
 			
 			dumpString("Decoded twice",
 					std::string (base64decodingIterator (reencodedData.begin()),
-							base64decodingIterator (reencodedData.end())));
+							base64decodingIterator (reencodedData.begin() + reencodedData.find("="))));
 		}
 		catch (const std::range_error& ex)
 		{
