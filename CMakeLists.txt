@@ -8,7 +8,8 @@ add_executable (HttpServer httpServer.cxx
 		synchronicity.cxx
 		handlers.cxx
 		runServer.cxx)
-#add_executable (HttpsServer httpsServer.cxx)
+add_executable (HttpClient
+		httpClient.cxx)
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
 
@@ -36,7 +37,7 @@ set (LIBS ${LIBS} ${CPPNETLIB_LIBRARIES})
 
 target_link_libraries (HelloWorld ${LIBS})
 target_link_libraries (HttpServer ${LIBS})
-#target_link_libraries (HttpsServer ${LIBS})
+target_link_libraries (HttpClient ${LIBS})
 
 
 # Generate demo certificates
