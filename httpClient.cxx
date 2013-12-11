@@ -42,10 +42,13 @@ int main(int argc, char * argv[]) {
         http::client client;
         std::ostringstream url;
         url << "http://" << host << ":" << port << "/";
-        http::client::request request(url.str());
-        http::client::response response =
-            client.get(request);
-        std::cout << body(response) << std::endl;
+
+		for (int i=0; i<5; i++) {
+			http::client::request request(url.str());
+			http::client::response response =
+				client.get(request);
+			std::cout << body(response) << std::endl;
+		}
     } catch (std::exception & e) {
         std::cerr << e.what() << std::endl;
         return 1;
