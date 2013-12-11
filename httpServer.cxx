@@ -52,34 +52,6 @@ int main(int argc, char * argv[])
 	}
 
 	runServer(synchronicity, handler, port); 
-
-	#if 0
-	if (asyncServer) {
-		ASyncHttpEchoHandler handler;
-
-		http::async_server<ASyncHttpEchoHandler>::options options(handler);
-		options.address("0.0.0.0")
-				.port(port);
-		options.thread_pool(boost::make_shared<boost::network::utils::thread_pool>(2));
-		http::async_server<ASyncHttpEchoHandler> server (options);
-
-		boost::thread t1(boost::bind(&http::async_server<ASyncHttpEchoHandler>::run, &server));
-		boost::thread t2(boost::bind(&http::async_server<ASyncHttpEchoHandler>::run, &server));
-		server.run();
-		t1.join();
-		t2.join();
-
-	} else {
-		SyncHttpEchoHandler handler;
-
-		http::server<SyncHttpEchoHandler>::options options(handler);
-		options.address("0.0.0.0")
-				.port(port);
-		http::server<SyncHttpEchoHandler> server (options);
-
-		server.run();
-	}
-	#endif
 }
 
 /* vim:set tabstop=4 shiftwidth=4 fo=cqwan autoindent : */
