@@ -38,8 +38,8 @@ int main(int argc, char * argv[]) {
 		exit(1);
 	}
     
+	http::client client;
     try {
-        http::client client;
         std::ostringstream url;
         url << "http://" << host << ":" << port << "/";
 
