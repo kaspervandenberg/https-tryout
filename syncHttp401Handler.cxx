@@ -101,10 +101,10 @@ void SyncHttp401Handler::operator()	(
 	
 	response = SyncHttpServer::response::stock_reply (
 			SyncHttpServer::response::unauthorized,
-			"<html><head><title>Demo: unathorized</title></head>\
-			<body><h1>Demo: unathorized</h1>\
-			This demo server always responds with 401 :: unauthorized\
-			</bdoy></html>");
+			"<html><head><title>Demo: unathorized</title></head>\n"
+			"<body><h1>Demo: unathorized</h1>\n"
+			"This demo server always responds with 401 :: unauthorized\n"
+			"</body></html>\n\n");
 	response.headers.push_back(Header {
 			"WWW-Authenticate",
 			"Basic realm=\"test\""});
