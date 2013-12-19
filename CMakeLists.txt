@@ -1,23 +1,39 @@
 cmake_minimum_required (VERSION 2.8)
 project (Https-Tryout)
 add_executable (HelloWorld helloWorld.cxx)
-add_executable (HttpServer httpServer.cxx
+
+add_executable (HttpServer
+		httpServer.cxx
 		syncHttpEchoHandler.cxx 
 		asyncHttpEchoHandler.cxx
 		syncHttp401Handler.cxx
 		synchronicity.cxx
 		handlers.cxx
 		runServer.cxx)
+
 add_executable (HttpClient
 		httpClient.cxx)
 
+add_executable (TryTest
+		tryTest.cxx)
+
 set(CMAKE_CXX_FLAGS "-std=c++11")
+
+# Tests
+enable_testing()
+add_test(NAME tryTest
+		COMMAND $<TARGET_FILE:TryTest>)
+option(TRY_TEST_EXECUTE_FAILING_TESTS "Includfe failing tests in TryTest" OFF)
+if(TRY_TEST_EXECUTE_FAILING_TESTS)
+	add_definitions(-DEXECUTE_FAILING_TESTS)
+endif(TRY_TEST_EXECUTE_FAILING_TESTS)
+
 
 # Use Boost
 set (Boost_USE_STATIC_LIBS OFF)
 set (Boost_USE_MULTITHREADED ON)
 set (Boost_USE_STATIC_RUNTIME OFF)
-find_package (Boost 1.54.0 REQUIRED system thread regex program_options serialization)
+find_package (Boost 1.54.0 REQUIRED system thread regex program_options serialization unit_test_framework)
 include_directories (${Boost_INCLUDE_DIRS})
 set (LIBS ${LIBS} ${Boost_LIBRARIES})
 
@@ -38,6 +54,7 @@ set (LIBS ${LIBS} ${CPPNETLIB_LIBRARIES})
 target_link_libraries (HelloWorld ${LIBS})
 target_link_libraries (HttpServer ${LIBS})
 target_link_libraries (HttpClient ${LIBS})
+target_link_libraries (TryTest ${LIBS})
 
 
 # Generate demo certificates
