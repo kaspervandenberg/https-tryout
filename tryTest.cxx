@@ -12,6 +12,15 @@ BOOST_AUTO_TEST_CASE( trivialEquals )
 
 BOOST_AUTO_TEST_CASE( trivialFailure )
 {
+/*	Having tests that always fail hinders testing,
+	therefore this test is only enabled when
+	EXECUTE_FAILING_TESTS is defined.
+	Use:
+	cmake -DTRY_TEST_EXECUTE_FAILING_TESTS=ON {source_path} && \
+	make && \
+	make test
+	to enable the test.
+*/
 #if defined( EXECUTE_FAILING_TESTS )
 	BOOST_CHECK_EQUAL(1, 0);
 #endif
