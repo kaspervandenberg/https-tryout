@@ -1,12 +1,15 @@
 #include <boost/network/protocol/http/client.hpp>
+#include <boost/asio/io_service.hpp>
 #include <boost/program_options.hpp>
-
 
 #include <string>
 #include <sstream>
 #include <iostream>
+//#include <memory>
+#include <boost/shared_ptr.hpp>
 
 namespace http = boost::network::http;
+namespace asio = boost::asio;
 namespace po = boost::program_options;
 
 int main(int argc, char * argv[]) {
@@ -38,8 +41,12 @@ int main(int argc, char * argv[]) {
 		exit(1);
 	}
     
-	http::client client;
-    try {
+	boost::shared_ptr<asio::io_service>  io_service { boost::make_shared<asio::io_service>() };
+	http::client client {
+			http::client::options {}
+					.io_service(io_service) };
+
+	try {
         std::ostringstream url;
         url << "http://" << host << ":" << port << "/";
 
@@ -47,10 +54,13 @@ int main(int argc, char * argv[]) {
 			http::client::request request(url.str());
 			http::client::response response =
 				client.get(request);
+
 			std::cout << body(response) << std::endl;
 		}
+		io_service->stop();
     } catch (std::exception & e) {
         std::cerr << e.what() << std::endl;
+		io_service->stop();
         return 1;
     }
     return 0;
