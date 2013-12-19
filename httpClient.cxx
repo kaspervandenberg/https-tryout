@@ -52,6 +52,7 @@ int main(int argc, char * argv[]) {
 
 		for (int i=0; i<5; i++) {
 			http::client::request request(url.str());
+			request << boost::network::header("Connection", "close");
 			http::client::response response =
 				client.get(request);
 
